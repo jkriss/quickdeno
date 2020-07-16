@@ -12,6 +12,8 @@ Currently supported:
 - Deno.readTextFileSync
 - Deno.stat (runs synchronously)
 - Deno.statSync
+- TextEncoder
+- TextDecoder
 
 ## Setup
 

@@ -4,6 +4,7 @@
 // @ts-ignore
 function assertEqual(actual: any, expected: any, message?: string) {
   assert(
+    // TODO use deep equals instead
     JSON.stringify(actual) === JSON.stringify(expected),
     message ||
       `Expected \n${JSON.stringify(actual)}\nto equal \n${
@@ -47,6 +48,9 @@ async function runTests() {
 
   testFileInfo(Deno.statSync("./test/hi.txt"));
   testFileInfo(await Deno.stat("./test/hi.txt"));
+
+  assertEqual(new TextEncoder().encode("hi"), new Uint8Array([104, 105]));
+  assertEqual(new TextDecoder().decode(new Uint8Array([104, 105])), "hi");
 
   // this one has to be last :-)
   Deno.exit(0);
