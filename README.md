@@ -17,7 +17,15 @@ You can either bundle to a js file that will run under Deno or quickjs, or you c
 
 ## Examples
 
-    
+    MESSAGE=hi! ./quickdeno.ts run examples/env.ts
+
+Or
+
+    ./quickdeno.ts bundle examples/env.ts > examples/env.bundle.js
+    MESSAGE="hi from quickjs!" qjs --std examples/env.bundle.js
+    MESSAGE="hi from deno!" deno run --allow-env examples/env.bundle.js 
+
+On my development machine, the qjs version runs about 10x faster.
 
 ## TypeScript setup
 
