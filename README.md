@@ -29,7 +29,7 @@ Currently supported:
 
 1. [Install quickjs](https://bellard.org/quickjs/)
 1. [Install Deno](https://deno.land/)
-1. Install quickdeno with `deno install -f --allow-run --allow-read https://raw.githubusercontent.com/jkriss/quickdeno/master/quickdeno.ts`
+1. Install quickdeno with `deno install -f --allow-run --allow-read --allow-write https://raw.githubusercontent.com/jkriss/quickdeno/master/quickdeno.ts`
 
 ## Run
 

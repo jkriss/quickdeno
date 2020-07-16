@@ -1,4 +1,4 @@
-#! /usr/bin/env -S deno run --allow-read --allow-run
+#! /usr/bin/env -S deno run --allow-read --allow-run --allow-write
 import { parse, Args } from "https://deno.land/std/flags/mod.ts";
 import { get, shimNames } from "./shims.ts";
 
@@ -6,10 +6,23 @@ const usage = `
 quickdeno bundle [options] <inputfile>
 quickdeno run [options] <inputfile> [...args]
 
+examples:
+
+# bundle hello.ts with defaults
+quickdeno bundle examples/hello.ts > examples/hello.bundle.js
+
+# bundle hello.ts with env and exit shims only
+quickdeno bundle --shims env,exit examples/hello.ts > examples/hello.bundle.js
+
+# bundle hello.ts without shims, save it as "hello" and make it executable
+quickdeno bundle --shims false -h -o hello examples/hello.ts
+
 options:
 
---shims=false  skip all shims
---shims [name1,name2...]
+-h                        add hashbang for qjs
+-o                        specify output file, and make it executable
+--shims=false             skip all shims
+--shims [name1,name2...]  only use these shims
 
 Only include these shims. Possible values:
 ${shimNames().join(", ")}
@@ -41,12 +54,22 @@ async function bundle(inputfile: string, args: Args) {
 }
 
 async function run(args: string[]) {
-  const parsedArgs = parse(args);
+  const parsedArgs = parse(args, { boolean: ["h"] });
 
   const [command, inputfile, ...rest] = parsedArgs._.map((a) => a.toString());
   if (command === "bundle") {
     const js = await bundle(inputfile, parsedArgs);
-    console.log(js);
+    let str = "";
+    if (parsedArgs.h) {
+      str += "#! /usr/bin/env -S qjs --std\n";
+    }
+    str += js + "\n";
+    if (parsedArgs.o) {
+      Deno.writeTextFileSync(parsedArgs.o, str);
+      if (parsedArgs.h) Deno.chmod(parsedArgs.o, 0o700);
+    } else {
+      console.log(str);
+    }
   } else if (command === "run") {
     const js = await bundle(inputfile, parsedArgs);
     const qjs = Deno.run({
