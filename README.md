@@ -10,6 +10,8 @@ Currently supported:
 - Deno.exit
 - Deno.open
 - Deno.openSync
+- Deno.readDir
+- Deno.readDirSync
 - Deno.readTextFile (runs synchronously)
 - Deno.readTextFileSync
 - Deno.stat (runs synchronously)

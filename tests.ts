@@ -69,6 +69,14 @@ async function runTests() {
   testFileInfo(Deno.statSync("./test/hi.txt"));
   testFileInfo(await Deno.stat("./test/hi.txt"));
 
+  const dirs: Deno.DirEntry[] = [];
+  for await (const dirEntry of Deno.readDir("./test")) {
+    dirs.push(dirEntry);
+  }
+  assertEquals(dirs.length, 2);
+  const another = dirs.find((d) => d.name === "another.txt");
+  assert(another?.isFile);
+
   assertEquals(new TextEncoder().encode("hi"), new Uint8Array([104, 105]));
   assertEquals(new TextDecoder().decode(new Uint8Array([104, 105])), "hi");
 

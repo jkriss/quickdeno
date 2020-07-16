@@ -26,23 +26,39 @@ Deno.readTextFile = async function (path) {
 `;
 
 const stat = `
-Deno.statSync = function (path) {
-  // TODO resolve file urls to paths
-  const [obj, err] = os.stat(path)
-  if (err) throw new Error(\`error: \${strerror(err)}\`)
-  const isSymlink = obj.mode === os.S_IFLNK
-  const isDirectory = obj.mode === os.S_IFDIR
-  return Object.assign(obj, {
-    isDirectory,
-    isSymlink,
-    isFile: !isDirectory && !isSymlink,
-    mtime: obj.mtime ? new Date(obj.mtime) : null
-  })
-}
 
-Deno.stat = async function(path) {
-  return Deno.statSync(path)
-}
+  Deno.statSync = function (path) {
+    // TODO resolve file urls to paths
+    const [obj, err] = os.stat(path)
+    if (err) throw new Error(\`error: \${strerror(err)}\`)
+    const isSymlink = obj.mode === os.S_IFLNK
+    const isDirectory = obj.mode === os.S_IFDIR
+    return Object.assign(obj, {
+      isDirectory,
+      isSymlink,
+      isFile: !isDirectory && !isSymlink,
+      mtime: obj.mtime ? new Date(obj.mtime) : null,
+      atime: obj.atime ? new Date(obj.atime) : null,
+      ctime: obj.ctime ? new Date(obj.ctime) : null
+    })
+  }
+  
+  Deno.stat = async function(path) {
+    return Deno.statSync(path)
+  }
+
+  Deno.readDirSync = function(path) {
+    const [names, err] = os.readdir(path)
+    if (err) throw new Error(strerror(err))
+    return names.filter(n => !['.', '..'].includes(n)).map(n => {
+      const info = Deno.statSync(path + '/' + n)
+      info.name = n
+      return info
+    })
+  }
+
+  Deno.readDir = Deno.readDirSync
+  
 `;
 
 // from https://github.com/anonyco/FastestSmallestTextEncoderDecoder
@@ -470,6 +486,7 @@ globalThis.URL = URL
 })(globalThis);
 `;
 
+// TODO open with the right flags
 const open = `
 
 Deno.openSync = function(path, options) {
