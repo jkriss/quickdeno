@@ -52,6 +52,10 @@ async function runTests() {
   assertEqual(new TextEncoder().encode("hi"), new Uint8Array([104, 105]));
   assertEqual(new TextDecoder().decode(new Uint8Array([104, 105])), "hi");
 
+  const headers = new Headers({ method: "GET" });
+  assertEqual(headers.get("method"), "GET");
+  assertEqual(headers.get("METHOD"), "GET");
+
   // this one has to be last :-)
   Deno.exit(0);
 }

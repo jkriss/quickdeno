@@ -12,6 +12,7 @@ Currently supported:
 - Deno.readTextFileSync
 - Deno.stat (runs synchronously)
 - Deno.statSync
+- Headers
 - TextEncoder
 - TextDecoder
 
