@@ -10,6 +10,8 @@ Currently supported:
 - Deno.exit
 - Deno.readTextFile (runs synchronously)
 - Deno.readTextFileSync
+- Deno.stat (runs synchronously)
+- Deno.statSync
 
 ## Setup
 
