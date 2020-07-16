@@ -1,6 +1,6 @@
 #! /usr/bin/env -S deno run --allow-read --allow-run
 
-import shims from "./shims.ts";
+import { get } from "./shims.ts";
 
 const usage = `
 quickdeno bundle <inputfile>
@@ -21,6 +21,10 @@ async function bundle(inputfile: string) {
     inputBundle = new TextDecoder().decode(output);
   }
   if (!inputBundle) throw new Error(`Couldn't bundle input file ${inputfile}`);
+
+  // default to getting all shims
+  // later, make this configurable
+  const shims = get();
 
   return `${shims}\n${inputBundle}`;
 }
