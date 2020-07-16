@@ -39,7 +39,7 @@ async function bundle(inputfile: string, args: Args) {
     stdout: "piped",
   });
   if (process.stdout) {
-    const output = await Deno.readAll(process.stdout);
+    const output = await process.output();
     inputBundle = new TextDecoder().decode(output);
   }
   if (!inputBundle) throw new Error(`Couldn't bundle input file ${inputfile}`);
@@ -53,6 +53,17 @@ async function bundle(inputfile: string, args: Args) {
   return `${shims}${inputBundle}`;
 }
 
+async function qjsPath() {
+  const process = Deno.run({ cmd: ["which", "qjs"], stdout: "piped" });
+  const status = await process.status();
+  if (!status.success) throw new Error(`Couldn't find qjs on this system`);
+  const output = await process.output().then((out) =>
+    new TextDecoder().decode(out)
+  );
+  console.error("found qjs:", output);
+  return output.trim();
+}
+
 async function run(args: string[]) {
   const parsedArgs = parse(args, { boolean: ["h"] });
 
@@ -61,7 +72,7 @@ async function run(args: string[]) {
     const js = await bundle(inputfile, parsedArgs);
     let str = "";
     if (parsedArgs.h) {
-      str += "#! /usr/bin/env -S qjs --std\n";
+      str += `#! ${await qjsPath()} --std\n`;
     }
     str += js + "\n";
     if (parsedArgs.o) {
