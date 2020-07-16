@@ -23,3 +23,6 @@ function assert(expr: any, message?: string) {
 assert(Deno.env.get("SHELL"), "should be able to get shell env var");
 
 assertEqual(Deno.args, ["arg1", "arg2"]);
+
+// this one has to be last :-)
+Deno.exit(0);

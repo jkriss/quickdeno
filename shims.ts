@@ -10,9 +10,12 @@ const args = `
   Deno.args = scriptArgs.slice(1);
 `;
 
+const exit = `Deno.exit = std.exit;`;
+
 const all = {
   env,
   args,
+  exit,
 };
 
 const allModules = new Map<string, string>(Object.entries(all));

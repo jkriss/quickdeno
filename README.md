@@ -7,6 +7,7 @@ quickdeno builds a bundle with your entrypoint and polyfills for some (but not a
 Currently supported:
 - Deno.args
 - Deno.env.get
+- Deno.exit
 
 ## Setup
 
