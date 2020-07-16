@@ -1,3 +1,6 @@
+// to run with quickjs:
+// ./quickdeno.ts run tests.ts
+
 function assert(expr: any, message?: string) {
   if (!expr) throw new Error(message || "assertion failed");
 }

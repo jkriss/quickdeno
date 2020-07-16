@@ -1,4 +1,6 @@
-#! /usr/bin/env -S deno run --unstable --allow-read --allow-run
+#! /usr/bin/env -S deno run --allow-read --allow-run
+
+import shims from "./shims.ts";
 
 const usage = `
 quickdeno bundle <inputfile>
@@ -8,7 +10,7 @@ quickdeno run <inputfile>
 async function bundle(inputfile: string) {
   if (!inputfile) throw new Error(`Must provide input file`);
   const shimsUrl = new URL("shims.js", import.meta.url);
-  // use exec to bundle the entry for now, not sure why the other way isn't working
+  // use exec to bundle the entry for now, the Deno.bundle call wasn't working with url imports
   let inputBundle: string | undefined;
   const process = Deno.run({
     cmd: ["deno", "bundle", inputfile],
@@ -20,7 +22,6 @@ async function bundle(inputfile: string) {
   }
   if (!inputBundle) throw new Error(`Couldn't bundle input file ${inputfile}`);
 
-  const shims = Deno.readTextFileSync(shimsUrl.pathname);
   return `${shims}\n${inputBundle}`;
 }
 
@@ -48,10 +49,3 @@ try {
 } catch (err) {
   console.error(err);
 }
-
-// const [diagnostics, emit] = await Deno.bundle("/foo.ts", {
-//   "/foo.ts": `import * as bar from "./bar.ts";\nconsole.log(bar);\n`,
-//   "/bar.ts": `export const bar = "bar";\n`,
-// });
-
-// console.log(emit);

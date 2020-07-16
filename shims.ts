@@ -1,3 +1,4 @@
+export default `
 if (typeof Deno === "undefined") {
   const Deno = {};
 
@@ -8,4 +9,4 @@ if (typeof Deno === "undefined") {
   };
 
   globalThis.Deno = Deno;
-}
+}`;

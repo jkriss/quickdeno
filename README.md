@@ -11,6 +11,7 @@ Currently supported:
 
 1. [Install quickjs](https://bellard.org/quickjs/)
 1. [Install Deno](https://deno.land/)
+1. Install quickdeno with `deno install -f --allow-run --allow-read https://raw.githubusercontent.com/jkriss/quickdeno/master/quickdeno.ts`
 
 ## Run
 
@@ -18,11 +19,11 @@ You can either bundle to a js file that will run under Deno or quickjs, or you c
 
 ## Examples
 
-    MESSAGE=hi! ./quickdeno.ts run examples/env.ts
+    MESSAGE=hi! quickdeno run examples/env.ts
 
 Or
 
-    ./quickdeno.ts bundle examples/env.ts > examples/env.bundle.js
+    quickdeno bundle examples/env.ts > examples/env.bundle.js
     MESSAGE="hi from quickjs!" qjs --std examples/env.bundle.js
     MESSAGE="hi from deno!" deno run --allow-env examples/env.bundle.js 
 
