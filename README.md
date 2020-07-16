@@ -8,10 +8,15 @@ Currently supported:
 - Deno.args
 - Deno.env.get
 - Deno.exit
+- Deno.open
+- Deno.openSync
 - Deno.readTextFile (runs synchronously)
 - Deno.readTextFileSync
 - Deno.stat (runs synchronously)
 - Deno.statSync
+- File.read
+- File.readSync
+- File.close
 - Headers
 - TextEncoder
 - TextDecoder

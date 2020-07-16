@@ -32,6 +32,25 @@ async function runTests() {
   const fileContents = await Deno.readTextFile("./test/hi.txt");
   assertEquals(fileContents, "hi");
 
+  const f = await Deno.open("./test/hi.txt");
+  assert(typeof f !== "undefined", "file handle should exist");
+  assert(typeof f.rid !== "undefined", "should get file handle id");
+  const buffer = new Uint8Array(2);
+  let len = await f.read(buffer);
+  assertEquals(len, 2);
+  assertEquals(buffer, new Uint8Array([104, 105]));
+  len = await f.read(buffer);
+  assertEquals(len, null);
+  f.close();
+
+  const f2 = Deno.openSync("./test/hi.txt");
+  len = f2.readSync(buffer);
+  assertEquals(len, 2);
+  assertEquals(buffer, new Uint8Array([104, 105]));
+  len = await f2.readSync(buffer);
+  assertEquals(len, null);
+  f2.close();
+
   function testFileInfo(fileInfo: Deno.FileInfo) {
     assert(fileInfo, "file info object should exist");
     assert(typeof fileInfo.isFile !== "undefined", "should have isFile");

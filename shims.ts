@@ -470,11 +470,41 @@ globalThis.URL = URL
 })(globalThis);
 `;
 
+const open = `
+
+Deno.openSync = function(path, options) {
+  const err = {}
+  const flags = os.O_RDWR
+  const f = os.open(path, flags)
+
+  let pos = 0
+  function readSync(p) {
+    if (pos >= p.buffer.byteLength) return null
+    const len = os.read(f, p.buffer, pos, p.buffer.byteLength)
+    if (len < 0) throw new Error('Error reading file')
+    else if (len === 0) return null
+    pos += len
+    return len
+  }
+
+  return {
+    rid: f,
+    read: readSync, 
+    readSync,
+    close: () => os.close(f)
+  }
+}
+
+Deno.open = Deno.openSync
+
+`;
+
 const all = {
   args,
   env,
   exit,
   headers,
+  open,
   readFile,
   stat,
   textEncoding,
