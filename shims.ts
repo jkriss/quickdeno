@@ -11,8 +11,10 @@ allModules.set(
 `,
 );
 
-export function get(modules?: string[]) {
-  if (!modules) modules = Array.from(allModules.values());
+export function get(moduleNames?: string[]) {
+  const modules = moduleNames
+    ? moduleNames.map((n) => allModules.get(n))
+    : Array.from(allModules.values());
 
   return `if (typeof Deno === "undefined") {
     const Deno = {};
