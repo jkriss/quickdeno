@@ -57,10 +57,9 @@ async function qjsPath() {
   const process = Deno.run({ cmd: ["which", "qjs"], stdout: "piped" });
   const status = await process.status();
   if (!status.success) throw new Error(`Couldn't find qjs on this system`);
-  const output = await process.output().then((out) =>
-    new TextDecoder().decode(out)
-  );
-  console.error("found qjs:", output);
+  const output = await process
+    .output()
+    .then((out) => new TextDecoder().decode(out));
   return output.trim();
 }
 
