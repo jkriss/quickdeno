@@ -2,7 +2,7 @@
 // ./quickdeno.ts run tests.ts arg1 arg2
 
 // @ts-ignore
-function assertEqual(actual: any, expected: any, message?: string) {
+function assertEquals(actual: any, expected: any, message?: string) {
   assert(
     // TODO use deep equals instead
     JSON.stringify(actual) === JSON.stringify(expected),
@@ -20,16 +20,17 @@ function assert(expr: any, message?: string) {
   if (!expr) throw new Error(message || "assertion failed");
 }
 
+// @ts-ignore
 async function runTests() {
   assert(Deno.env.get("SHELL"), "should be able to get shell env var");
 
-  assertEqual(Deno.args, ["arg1", "arg2"]);
+  assertEquals(Deno.args, ["arg1", "arg2"]);
 
-  assertEqual(Deno.readTextFileSync("./test/hi.txt"), "hi");
+  assertEquals(Deno.readTextFileSync("./test/hi.txt"), "hi");
 
   assert(Deno.readTextFile, "readTextFile should be defined");
   const fileContents = await Deno.readTextFile("./test/hi.txt");
-  assertEqual(fileContents, "hi");
+  assertEquals(fileContents, "hi");
 
   function testFileInfo(fileInfo: Deno.FileInfo) {
     assert(fileInfo, "file info object should exist");
@@ -49,12 +50,18 @@ async function runTests() {
   testFileInfo(Deno.statSync("./test/hi.txt"));
   testFileInfo(await Deno.stat("./test/hi.txt"));
 
-  assertEqual(new TextEncoder().encode("hi"), new Uint8Array([104, 105]));
-  assertEqual(new TextDecoder().decode(new Uint8Array([104, 105])), "hi");
+  assertEquals(new TextEncoder().encode("hi"), new Uint8Array([104, 105]));
+  assertEquals(new TextDecoder().decode(new Uint8Array([104, 105])), "hi");
 
   const headers = new Headers({ method: "GET" });
-  assertEqual(headers.get("method"), "GET");
-  assertEqual(headers.get("METHOD"), "GET");
+  assertEquals(headers.get("method"), "GET");
+  assertEquals(headers.get("METHOD"), "GET");
+
+  const url = new URL("https://deno.land/?some=value");
+  assertEquals(url.href, "https://deno.land/?some=value");
+  assertEquals(url.search, "?some=value");
+  const query = new URLSearchParams(url.search);
+  assertEquals(query.get("some"), "value");
 
   // this one has to be last :-)
   Deno.exit(0);

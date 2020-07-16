@@ -15,6 +15,8 @@ Currently supported:
 - Headers
 - TextEncoder
 - TextDecoder
+- URL
+- URLSearchParams
 
 ## Setup
 
