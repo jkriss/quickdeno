@@ -1,6 +1,7 @@
 // to run with quickjs:
 // ./quickdeno.ts run tests.ts arg1 arg2
 
+// @ts-ignore
 function assertEqual(actual: any, expected: any, message?: string) {
   assert(
     JSON.stringify(actual) === JSON.stringify(expected),
@@ -13,6 +14,7 @@ function assertEqual(actual: any, expected: any, message?: string) {
   );
 }
 
+// @ts-ignore
 function assert(expr: any, message?: string) {
   if (!expr) throw new Error(message || "assertion failed");
 }
