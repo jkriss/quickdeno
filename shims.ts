@@ -530,6 +530,10 @@ const all = {
 
 const allModules = new Map<string, string>(Object.entries(all));
 
+export function shimNames() {
+  return Object.keys(all);
+}
+
 export function get(moduleNames?: string[]) {
   const modules = moduleNames
     ? moduleNames.map((n) => allModules.get(n))
