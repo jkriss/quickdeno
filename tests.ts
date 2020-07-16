@@ -19,10 +19,22 @@ function assert(expr: any, message?: string) {
   if (!expr) throw new Error(message || "assertion failed");
 }
 
-// test env retreival
-assert(Deno.env.get("SHELL"), "should be able to get shell env var");
+async function runTests() {
+  assert(Deno.env.get("SHELL"), "should be able to get shell env var");
 
-assertEqual(Deno.args, ["arg1", "arg2"]);
+  assertEqual(Deno.args, ["arg1", "arg2"]);
 
-// this one has to be last :-)
-Deno.exit(0);
+  assertEqual(Deno.readTextFileSync("./test/hi.txt"), "hi");
+
+  assert(Deno.readTextFile, "readTextFile should be defined");
+  const fileContents = await Deno.readTextFile("./test/hi.txt");
+  assertEqual(fileContents, "hi");
+
+  // this one has to be last :-)
+  Deno.exit(0);
+}
+
+runTests().catch((err: Error) => {
+  console.log(err, err.stack);
+  Deno.exit(1);
+});

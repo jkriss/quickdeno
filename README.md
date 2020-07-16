@@ -8,6 +8,8 @@ Currently supported:
 - Deno.args
 - Deno.env.get
 - Deno.exit
+- Deno.readTextFile (runs synchronously)
+- Deno.readTextFileSync
 
 ## Setup
 

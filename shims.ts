@@ -12,10 +12,24 @@ const args = `
 
 const exit = `Deno.exit = std.exit;`;
 
+const readFile = `
+Deno.readTextFileSync = function (path) {
+  // TODO resolve file urls to local paths
+  const text = std.loadFile(path);
+  if (text === null) throw new Error(\`Error reading file \${path}\`);
+  return text;
+}
+
+Deno.readTextFile = async function (path) {
+  return Deno.readTextFileSync(path)
+}
+`;
+
 const all = {
-  env,
   args,
+  env,
   exit,
+  readFile,
 };
 
 const allModules = new Map<string, string>(Object.entries(all));
