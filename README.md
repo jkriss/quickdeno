@@ -5,6 +5,7 @@ Tools for bundling and running Deno code that will run with [quickjs](https://be
 quickdeno builds a bundle with your entrypoint and polyfills for some (but not all) Deno runtime functions, variables, and classes.
 
 Currently supported:
+- Deno.args
 - Deno.env.get
 
 ## Setup

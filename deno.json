@@ -1,5 +1,0 @@
-{
-  "cmds": {
-    "test": "deno run --allow-read --allow-run quickdeno.ts run tests.ts"
-  }
-}

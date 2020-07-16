@@ -1,22 +1,29 @@
-const allModules = new Map<string, string>();
-
-allModules.set(
-  "env",
-  `
+const env = `
  Deno.env = {
     get(k) {
       return std.getenv(k);
     },
   };
-`,
-);
+`;
+
+const args = `
+  Deno.args = scriptArgs.slice(1);
+`;
+
+const all = {
+  env,
+  args,
+};
+
+const allModules = new Map<string, string>(Object.entries(all));
 
 export function get(moduleNames?: string[]) {
   const modules = moduleNames
     ? moduleNames.map((n) => allModules.get(n))
     : Array.from(allModules.values());
 
-  return `if (typeof Deno === "undefined") {
+  return `
+  if (typeof Deno === "undefined") {
     const Deno = {};
   
     ${modules.join("\n")}

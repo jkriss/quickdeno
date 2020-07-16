@@ -30,14 +30,14 @@ async function bundle(inputfile: string) {
 }
 
 async function run(args: string[]) {
-  const [command, inputfile] = args;
+  const [command, inputfile, ...rest] = args;
   if (command === "bundle") {
     const js = await bundle(inputfile);
     console.log(js);
   } else if (command === "run") {
     const js = await bundle(inputfile);
     const qjs = Deno.run({
-      cmd: ["qjs", "--std", "-e", js],
+      cmd: ["qjs", "--std", "-e", js, inputfile, ...rest],
     });
     const status = await qjs.status();
     Deno.exit(status.code);
