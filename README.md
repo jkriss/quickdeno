@@ -10,6 +10,7 @@ Currently supported:
 ## Setup
 
 1. [Install quickjs](https://bellard.org/quickjs/)
+1. [Install Deno](https://deno.land/)
 
 ## Run
 
