@@ -520,11 +520,32 @@ Deno.open = Deno.openSync
 `;
 
 const stdio = `
-Deno.stdout = {
-  rid: std.out,
-  writeSync: async (p) => os.write(std.out, p.buffer, 0, p.buffer.byteLength)
-}
-Deno.stdout.write = Deno.stdout.writeSync
+;(function(){
+  Deno.stdout = {
+    rid: std.out,
+    writeSync: (p) => {
+      const len = os.write(std.out, p.buffer, 0, p.buffer.byteLength)
+      if (len < 0) throw new Error('error writing to stdout: ' + std.strerror(len))
+      return len
+    }
+  }
+  //Deno.stdout.write = Deno.stdout.writeSync  
+
+  async function waitUntilReady(fd) {
+    return new Promise(resolve => {
+      os.setWriteHandler(fd, () => {
+        os.setWriteHandler(fd, null)
+        resolve()
+      })
+    })
+  }
+
+  Deno.stdout.write = async (p) => {
+    os.open()
+    await waitUntilReady(Deno.stdout.rid)
+    return Deno.stdout.writeSync(p)
+  }
+})()
 `;
 
 const timeout = `
@@ -534,40 +555,28 @@ const timeout = `
   const timers = {}
   const sleepIncrement = 5
 
-  globalThis.setInterval = function(fn, delay, runOnce) {
+  globalThis.setInterval = function(fn, delay) {
     const t = Object.keys(timers).length+1
-    timers[t] = Date.now()
-    let stopAt = timers[t] + delay
-    ;(async () => {
-      while (true) {
-        const timer = timers[t]
-        if (!timer) break
-        if (Date.now() > stopAt) {
-          fn()
-          if (runOnce) {
-            delete timers[t]
-          } else {
-            stopAt += delay
-            os.sleep(sleepIncrement)
-          }
-        } else {
-          os.sleep(sleepIncrement)
-        }
+    function loop() {
+      fn()
+      if (timers[t]) {
+        timers[t] = setTimeout(loop, delay)
       }
-    })()
-
+    }
+    timers[t] = setTimeout(loop, delay)
     return t
   }
 
-  globalThis.setTimeout = function(fn, delay) {
-    return setInterval(fn, delay, true)
+  globalThis.clearInterval = function(t) {
+    if (timers[t]) clearTimeout(timers[t])
   }
+  globalThis.setTimeout = os.setTimeout
 
   globalThis.clearInterval = function(t) {
     delete timers[t]
   }
 
-  globalThis.clearTimeout = clearInterval
+  globalThis.clearTimeout = os.clearTimeout
 
 })()
 
