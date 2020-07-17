@@ -487,31 +487,31 @@ globalThis.URL = URL
 })(globalThis);
 `;
 
-// TODO open with the right flags
+// TODO use the right flags
 const open = `
 
 Deno.openSync = function(path, options) {
   const err = {}
-  const flags = os.O_RDWR
-  const f = os.open(path, flags)
+  const f = std.open(path, "r", err)
+  if (err.errno) throw new Error(\`Error opening file: \${str.strerr(err.errno)}\`)
 
-  let pos = 0
   let done = false
   function readSync(p) {
-    if (done || pos >= p.buffer.byteLength) return null
-    const len = os.read(f, p.buffer, pos, p.buffer.byteLength)
-    if (len < p.buffer.byteLength) done = true
-    if (len < 0) throw new Error('Error reading file')
-    else if (len === 0) return null
-    pos += len
-    return len
+    if (done) return null
+    const result = f.read(p.buffer, 0, p.byteLength)
+    if (f.error()) throw new Error('Error reading file')
+    if (f.eof()) {
+      if (result === 0) return null
+      done = true
+    } 
+    return result
   }
 
   return {
     rid: f,
     read: readSync, 
     readSync,
-    close: () => os.close(f)
+    close: () => f.close()
   }
 }
 
@@ -522,39 +522,17 @@ Deno.open = Deno.openSync
 const stdio = `
 ;(function(){
 
-  function osWriteSync(fd, p) {
-    const len = os.write(fd, p.buffer, 0, p.buffer.byteLength)
-    if (len < 0) throw new Error('error writing to file descriptor: ' + std.strerror(len))
-    return len
-  }
-
-  async function osWrite(fd, p) {
-    async (p) => {
-      await waitUntilReady(Deno.stdout.rid)
-      return Deno.stdout.writeSync(p)
-    }
-  }
-
   Deno.stdout = {
-    rid: std.out,
-    writeSync: (p) => osWriteSync(std.out, p),
-    write: (p) => osWrite(std.out, p)
+    rid: std.out.fileno(),
+    writeSync: (p) => std.out.write(p.buffer, 0, p.byteLength)
   }
+  Deno.stdout.write = Deno.stdout.writeSync
 
   Deno.stderr = {
-    rid: std.err,
-    writeSync: (p) => osWriteSync(std.err, p),
-    write: (p) => osWrite(std.err, p)
+    rid: std.err.fileno(),
+    writeSync: (p) => std.err.write(p.buffer, 0, p.byteLength),
   }
-
-  async function waitUntilReady(fd) {
-    return new Promise(resolve => {
-      os.setWriteHandler(fd, () => {
-        os.setWriteHandler(fd, null)
-        resolve()
-      })
-    })
-  }
+  Deno.stderr.write = Deno.stderr.writeSync
 
   console.error = (...parts) => {
     const te = new TextEncoder()

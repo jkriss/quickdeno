@@ -122,6 +122,11 @@ async function runTests() {
 
   assert(Deno.stdout, "stdout should be defined");
   assert(Deno.stdout.rid, "stdout should have a file descriptor");
+  assertEquals(
+    typeof Deno.stdout.rid,
+    "number",
+    "stdout file descriptor should be a number",
+  );
   assert(Deno.stdout.write, "stdout should have a write method");
   assert(Deno.stdout.writeSync, "stdout should have a writeSync method");
   await Deno.stdout.write(new TextEncoder().encode("test\n"));
@@ -129,6 +134,11 @@ async function runTests() {
 
   assert(Deno.stderr, "stderr should be defined");
   assert(Deno.stderr.rid, "stderr should have a file descriptor");
+  assertEquals(
+    typeof Deno.stderr.rid,
+    "number",
+    "stderr file descriptor should be a number",
+  );
   assert(Deno.stderr.write, "stderr should have a write method");
   assert(Deno.stderr.writeSync, "stderr should have a writeSync method");
   await Deno.stderr.write(new TextEncoder().encode("stderr test\n"));
