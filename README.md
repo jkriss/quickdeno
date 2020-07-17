@@ -24,6 +24,8 @@ Currently supported:
 - TextDecoder
 - URL
 - URLSearchParams
+- setTimeout / clearTimeout (blocking!)
+- setInterval / clearInterval (blocking!)
 
 ## Setup
 

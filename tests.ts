@@ -17,7 +17,14 @@ function assertEquals(actual: any, expected: any, message?: string) {
 
 // @ts-ignore
 function assert(expr: any, message?: string) {
-  if (!expr) throw new Error(message || "assertion failed");
+  if (!expr) throw new Error(message + "\n" || "assertion failed");
+}
+
+// @ts-ignore
+async function sleep(time: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), time);
+  });
 }
 
 // @ts-ignore
@@ -89,6 +96,23 @@ async function runTests() {
   assertEquals(url.search, "?some=value");
   const query = new URLSearchParams(url.search);
   assertEquals(query.get("some"), "value");
+
+  assert(typeof setTimeout !== "undefined", "setTimeout should exist");
+  await sleep(2);
+
+  assert(typeof clearTimeout !== "undefined", "clearTimeout should exist");
+  const t = setTimeout(() => {
+    throw new Error(`shouldn't happen`);
+  }, 1000);
+  clearTimeout(t);
+
+  assert(typeof setInterval !== "undefined", "setInterval should exist");
+  assert(typeof clearInterval !== "undefined", "clearInterval should exist");
+  console.log("setInterval:", setInterval);
+  const t2 = setInterval(() => {
+    throw new Error(`shouldn't happen`);
+  }, 1000);
+  clearInterval(t2);
 
   // this one has to be last :-)
   Deno.exit(0);

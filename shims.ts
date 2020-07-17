@@ -516,6 +516,36 @@ Deno.open = Deno.openSync
 
 `;
 
+const timeout = `
+
+;(function(){
+
+  const timers = {}
+
+  globalThis.setInterval = function(fn, delay, runOnce) {
+    const t = Object.keys(timers).length+1
+    os.sleep(delay)
+    if (timers[t]) {
+      fn()
+      if (runOnce) delete timers[t]
+    }
+    return t
+  }
+
+  globalThis.setTimeout = function(fn, delay) {
+    return setInterval(fn, delay, true)
+  }
+
+  globalThis.clearInterval = function(t) {
+    delete timers[t]
+  }
+
+  globalThis.clearTimeout = clearInterval
+
+})()
+
+`;
+
 const all = {
   args,
   env,
@@ -526,6 +556,7 @@ const all = {
   stat,
   textEncoding,
   url,
+  timeout,
 };
 
 const allModules = new Map<string, string>(Object.entries(all));
