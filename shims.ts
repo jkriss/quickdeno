@@ -541,7 +541,6 @@ const stdio = `
   }
 
   Deno.stdout.write = async (p) => {
-    os.open()
     await waitUntilReady(Deno.stdout.rid)
     return Deno.stdout.writeSync(p)
   }
