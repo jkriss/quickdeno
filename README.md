@@ -15,6 +15,7 @@ Currently supported:
 - Deno.readTextFile (runs synchronously)
 - Deno.readTextFileSync
 - Deno.stat (runs synchronously)
+- Deno.stdout.write / writeSync
 - Deno.statSync
 - File.read
 - File.readSync

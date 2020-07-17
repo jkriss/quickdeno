@@ -1,7 +1,7 @@
 // to run with quickjs:
 // ./quickdeno.ts run tests.ts arg1 arg2
+export {};
 
-// @ts-ignore
 function assertEquals(actual: any, expected: any, message?: string) {
   assert(
     // TODO use deep equals instead
@@ -15,19 +15,16 @@ function assertEquals(actual: any, expected: any, message?: string) {
   );
 }
 
-// @ts-ignore
 function assert(expr: any, message?: string) {
   if (!expr) throw new Error(message + "\n" || "assertion failed");
 }
 
-// @ts-ignore
 async function sleep(time: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(() => resolve(), time);
   });
 }
 
-// @ts-ignore
 async function runTests() {
   assert(Deno.env.get("SHELL"), "should be able to get shell env var");
 
@@ -54,9 +51,16 @@ async function runTests() {
   len = f2.readSync(buffer);
   assertEquals(len, 2);
   assertEquals(buffer, new Uint8Array([104, 105]));
-  len = await f2.readSync(buffer);
+  len = f2.readSync(buffer);
   assertEquals(len, null);
   f2.close();
+
+  const buffer2 = new Uint8Array(2048);
+  const f3 = Deno.openSync("./test/another.txt");
+  len = f3.readSync(buffer2);
+  len = f3.readSync(buffer2);
+  assertEquals(len, null);
+  f3.close();
 
   function testFileInfo(fileInfo: Deno.FileInfo) {
     assert(fileInfo, "file info object should exist");
@@ -115,6 +119,13 @@ async function runTests() {
     throw new Error(`shouldn't happen`);
   }, 1000);
   clearInterval(t2);
+
+  assert(Deno.stdout, "stdout should be defined");
+  assert(Deno.stdout.rid, "stdout should have a file descriptor");
+  assert(Deno.stdout.write, "stdout should have a write method");
+  assert(Deno.stdout.writeSync, "stdout should have a writeSync method");
+  await Deno.stdout.write(new TextEncoder().encode("test\n"));
+  Deno.stdout.writeSync(new TextEncoder().encode("test sync\n"));
 
   // this one has to be last :-)
   Deno.exit(0);

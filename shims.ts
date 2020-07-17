@@ -30,7 +30,7 @@ const stat = `
   Deno.statSync = function (path) {
     // TODO resolve file urls to paths
     const [obj, err] = os.stat(path)
-    if (err) throw new Error(\`error: \${strerror(err)}\`)
+    if (err) throw new Error(\`error: \${std.strerror(err)}\`)
     const isSymlink = obj.mode === os.S_IFLNK
     const isDirectory = obj.mode === os.S_IFDIR
     return Object.assign(obj, {
@@ -49,7 +49,7 @@ const stat = `
 
   Deno.readDirSync = function(path) {
     const [names, err] = os.readdir(path)
-    if (err) throw new Error(strerror(err))
+    if (err) throw new Error(std.strerror(err))
     return names.filter(n => !['.', '..'].includes(n)).map(n => {
       const info = Deno.statSync(path + '/' + n)
       info.name = n
@@ -496,9 +496,11 @@ Deno.openSync = function(path, options) {
   const f = os.open(path, flags)
 
   let pos = 0
+  let done = false
   function readSync(p) {
-    if (pos >= p.buffer.byteLength) return null
+    if (done || pos >= p.buffer.byteLength) return null
     const len = os.read(f, p.buffer, pos, p.buffer.byteLength)
+    if (len < p.buffer.byteLength) done = true
     if (len < 0) throw new Error('Error reading file')
     else if (len === 0) return null
     pos += len
@@ -515,6 +517,14 @@ Deno.openSync = function(path, options) {
 
 Deno.open = Deno.openSync
 
+`;
+
+const stdio = `
+Deno.stdout = {
+  rid: std.out,
+  writeSync: async (p) => os.write(std.out, p.buffer, 0, p.buffer.byteLength)
+}
+Deno.stdout.write = Deno.stdout.writeSync
 `;
 
 const timeout = `
@@ -574,6 +584,7 @@ const all = {
   textEncoding,
   url,
   timeout,
+  stdio,
 };
 
 const allModules = new Map<string, string>(Object.entries(all));
