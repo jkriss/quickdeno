@@ -146,6 +146,8 @@ async function runTests() {
 
   console.error("This should go to stderr");
 
+  assert(Deno.build.os, "should report the current os");
+
   // this one has to be last :-)
   Deno.exit(0);
 }

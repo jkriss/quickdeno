@@ -579,6 +579,12 @@ const timeout = `
 
 `;
 
+const build = `{
+  Deno.build = {
+    os: os.platform
+  }
+}`;
+
 const all = {
   args,
   env,
@@ -591,6 +597,7 @@ const all = {
   url,
   timeout,
   stdio,
+  build,
 };
 
 const allModules = new Map<string, string>(Object.entries(all));
