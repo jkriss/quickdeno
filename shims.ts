@@ -472,6 +472,7 @@ globalThis.URL = URL
   scope.URLSearchParams = scope.URLSearchParams  ||  function (searchString) {
       var self = this;
       self.searchString = searchString;
+      if (!searchString.includes('/') && !searchString.startsWith('?')) self.searchString = '?'+searchString
       self.get = function (name) {
           var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(self.searchString);
           if (results == null) {

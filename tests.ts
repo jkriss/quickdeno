@@ -96,6 +96,8 @@ async function runTests() {
   assertEquals(url.search, "?some=value");
   const query = new URLSearchParams(url.search);
   assertEquals(query.get("some"), "value");
+  const query2 = new URLSearchParams("some=value");
+  assertEquals(query2.get("some"), "value");
 
   assert(typeof setTimeout !== "undefined", "setTimeout should exist");
   await sleep(2);
