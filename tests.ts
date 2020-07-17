@@ -108,7 +108,6 @@ async function runTests() {
 
   assert(typeof setInterval !== "undefined", "setInterval should exist");
   assert(typeof clearInterval !== "undefined", "clearInterval should exist");
-  console.log("setInterval:", setInterval);
   const t2 = setInterval(() => {
     throw new Error(`shouldn't happen`);
   }, 1000);

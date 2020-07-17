@@ -521,14 +521,30 @@ const timeout = `
 ;(function(){
 
   const timers = {}
+  const sleepIncrement = 5
 
   globalThis.setInterval = function(fn, delay, runOnce) {
     const t = Object.keys(timers).length+1
-    os.sleep(delay)
-    if (timers[t]) {
-      fn()
-      if (runOnce) delete timers[t]
-    }
+    timers[t] = Date.now()
+    let stopAt = timers[t] + delay
+    ;(async () => {
+      while (true) {
+        const timer = timers[t]
+        if (!timer) break
+        if (Date.now() > stopAt) {
+          fn()
+          if (runOnce) {
+            delete timers[t]
+          } else {
+            stopAt += delay
+            os.sleep(sleepIncrement)
+          }
+        } else {
+          os.sleep(sleepIncrement)
+        }
+      }
+    })()
+
     return t
   }
 
