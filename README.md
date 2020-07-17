@@ -5,6 +5,7 @@ Tools for bundling and running Deno code that will run with [quickjs](https://be
 quickdeno builds a bundle with your entrypoint and polyfills for some (but not all) Deno runtime functions, variables, and classes.
 
 Currently supported:
+- console.error
 - Deno.args
 - Deno.env.get
 - Deno.exit
@@ -15,6 +16,7 @@ Currently supported:
 - Deno.readTextFile (runs synchronously)
 - Deno.readTextFileSync
 - Deno.stat (runs synchronously)
+- Deno.stderr.write / writeSync
 - Deno.stdout.write / writeSync
 - Deno.statSync
 - File.read

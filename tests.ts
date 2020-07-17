@@ -127,6 +127,15 @@ async function runTests() {
   await Deno.stdout.write(new TextEncoder().encode("test\n"));
   Deno.stdout.writeSync(new TextEncoder().encode("test sync\n"));
 
+  assert(Deno.stderr, "stderr should be defined");
+  assert(Deno.stderr.rid, "stderr should have a file descriptor");
+  assert(Deno.stderr.write, "stderr should have a write method");
+  assert(Deno.stderr.writeSync, "stderr should have a writeSync method");
+  await Deno.stderr.write(new TextEncoder().encode("stderr test\n"));
+  Deno.stderr.writeSync(new TextEncoder().encode("stderrtest sync\n"));
+
+  console.error("This should go to stderr");
+
   // this one has to be last :-)
   Deno.exit(0);
 }

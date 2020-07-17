@@ -521,15 +521,31 @@ Deno.open = Deno.openSync
 
 const stdio = `
 ;(function(){
-  Deno.stdout = {
-    rid: std.out,
-    writeSync: (p) => {
-      const len = os.write(std.out, p.buffer, 0, p.buffer.byteLength)
-      if (len < 0) throw new Error('error writing to stdout: ' + std.strerror(len))
-      return len
+
+  function osWriteSync(fd, p) {
+    const len = os.write(fd, p.buffer, 0, p.buffer.byteLength)
+    if (len < 0) throw new Error('error writing to file descriptor: ' + std.strerror(len))
+    return len
+  }
+
+  async function osWrite(fd, p) {
+    async (p) => {
+      await waitUntilReady(Deno.stdout.rid)
+      return Deno.stdout.writeSync(p)
     }
   }
-  //Deno.stdout.write = Deno.stdout.writeSync  
+
+  Deno.stdout = {
+    rid: std.out,
+    writeSync: (p) => osWriteSync(std.out, p),
+    write: (p) => osWrite(std.out, p)
+  }
+
+  Deno.stderr = {
+    rid: std.err,
+    writeSync: (p) => osWriteSync(std.err, p),
+    write: (p) => osWrite(std.err, p)
+  }
 
   async function waitUntilReady(fd) {
     return new Promise(resolve => {
@@ -540,10 +556,14 @@ const stdio = `
     })
   }
 
-  Deno.stdout.write = async (p) => {
-    await waitUntilReady(Deno.stdout.rid)
-    return Deno.stdout.writeSync(p)
+  console.error = (...parts) => {
+    const te = new TextEncoder()
+    for (const p of parts) {
+      Deno.stderr.writeSync(te.encode(p.toString()))
+    }
+    Deno.stderr.writeSync(te.encode('\\n'))
   }
+
 })()
 `;
 
