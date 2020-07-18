@@ -148,6 +148,8 @@ async function runTests() {
 
   assert(Deno.build.os, "should report the current os");
 
+  assert(typeof Deno.noColor !== "undefined", "Deno.noColor should be defined");
+
   // this one has to be last :-)
   Deno.exit(0);
 }

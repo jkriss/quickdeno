@@ -585,6 +585,10 @@ const build = `{
   }
 }`;
 
+const noColor = `
+Deno.noColor = !!Deno.env.get('NO_COLOR')
+`;
+
 const all = {
   args,
   env,
@@ -598,6 +602,7 @@ const all = {
   timeout,
   stdio,
   build,
+  noColor,
 };
 
 const allModules = new Map<string, string>(Object.entries(all));

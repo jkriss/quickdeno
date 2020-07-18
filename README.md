@@ -10,6 +10,7 @@ Currently supported:
 - Deno.build.os
 - Deno.env.get
 - Deno.exit
+- Deno.noColor
 - Deno.open
 - Deno.openSync
 - Deno.readDir
