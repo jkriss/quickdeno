@@ -4,7 +4,8 @@ import { get, shimNames } from "./shims.ts";
 
 const usage = `
 quickdeno bundle [options] <inputfile>
-quickdeno run [options] <inputfile> [...args]
+quickdeno run [options] <inputfile> [-- <command arguments>]
+quickdeno compile [options] <inputfile> [-- <compiler options>]
 
 examples:
 
@@ -17,6 +18,9 @@ quickdeno bundle --shims env,exit examples/hello.ts > examples/hello.bundle.js
 # bundle hello.ts without shims, save it as "hello" and make it executable
 quickdeno bundle --shims false -h -o hello examples/hello.ts
 
+# compile hello.ts with -flto flag
+quickdeno compile examples/hello.ts -- -flto
+
 options:
 
 -h                        add hashbang for qjs
@@ -28,6 +32,10 @@ Only include these shims. Possible values:
 ${shimNames().join(", ")}
 
 `.trim();
+
+const quickjsImports = `import * as std from "std";
+import * as os from "os";
+`;
 
 async function bundle(inputfile: string, args: Args) {
   if (!inputfile) throw new Error(`Must provide input file`);
@@ -63,8 +71,21 @@ async function qjsPath() {
   return output.trim();
 }
 
+async function compile(
+  sourceFile: string,
+  outputFile: string,
+  args?: string[],
+) {
+  if (!args) args = [];
+  const process = Deno.run(
+    { cmd: ["qjsc", ...args, "-o", outputFile, sourceFile] },
+  );
+  const status = await process.status();
+  if (!status.success) throw new Error(`Error compiling`);
+}
+
 async function run(args: string[]) {
-  const parsedArgs = parse(args, { boolean: ["h"] });
+  const parsedArgs = parse(args, { boolean: ["h"], "--": true });
 
   const [command, inputfile, ...rest] = parsedArgs._.map((a) => a.toString());
   if (command === "bundle") {
@@ -83,10 +104,19 @@ async function run(args: string[]) {
   } else if (command === "run") {
     const js = await bundle(inputfile, parsedArgs);
     const qjs = Deno.run({
-      cmd: ["qjs", "--std", "-e", js, inputfile, ...rest],
+      cmd: ["qjs", "--std", "-e", js, inputfile, ...parsedArgs["--"]],
     });
     const status = await qjs.status();
     Deno.exit(status.code);
+  } else if (command === "compile") {
+    const js = await bundle(inputfile, parsedArgs);
+    // prepend the quickjs-specific imports
+    const source = `${quickjsImports}${js}`;
+    const tmpFile = Deno.makeTempFileSync();
+    Deno.writeFileSync(tmpFile, new TextEncoder().encode(source));
+    const outputFile = parsedArgs.o || inputfile.replace(/\.(.*)/, "");
+    await compile(tmpFile, outputFile, parsedArgs["--"]);
+    Deno.removeSync(tmpFile);
   } else {
     console.error(`No command ${command}\n`);
     console.error(usage);

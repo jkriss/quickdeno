@@ -616,9 +616,10 @@ export function get(moduleNames?: string[]) {
     ? moduleNames.map((n) => allModules.get(n))
     : Array.from(allModules.values());
 
-  return `
+  return `  
   if (typeof Deno === "undefined") {
     const Deno = {};
+    globalThis.global = globalThis
   
     ${modules.join("\n")}
   
