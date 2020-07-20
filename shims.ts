@@ -542,6 +542,28 @@ const stdio = `
     Deno.stderr.writeSync(te.encode('\\n'))
   }
 
+  Deno.stdin = {
+    rid: std.in.fileno(),
+    readSync: function (p) {
+      const fd = std.in.fileno()
+      const result = os.read(fd, p.buffer, 0, p.buffer.byteLength)
+      if (result < 0) throw new Error('Error reading file')
+      return result
+    }
+  }
+
+  Deno.stdin.read = async function (p) {
+    const fd = std.in.fileno()
+    return new Promise((resolve, reject) => {
+      os.setReadHandler(fd, () => {
+        os.setReadHandler(fd, null)
+        const result = os.read(fd, p.buffer, 0, p.buffer.byteLength)
+        if (result < 0) reject(new Error('Error reading file'))
+        resolve(result)
+      })
+    })
+  }
+
 })()
 `;
 
