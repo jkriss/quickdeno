@@ -27,6 +27,9 @@ async function sleep(time: number): Promise<void> {
 
 async function runTests() {
   assert(Deno.env.get("SHELL"), "should be able to get shell env var");
+  Deno.env.set("CUSTOM", "something");
+  assert(Deno.env.get, "Deno.env.get should exist");
+  assertEquals(Deno.env.get("CUSTOM"), "something");
 
   assertEquals(Deno.args, ["arg1", "arg2"]);
 

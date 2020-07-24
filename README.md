@@ -9,6 +9,7 @@ Currently supported:
 - Deno.args
 - Deno.build.os
 - Deno.env.get
+- Deno.env.set
 - Deno.exit
 - Deno.noColor
 - Deno.open

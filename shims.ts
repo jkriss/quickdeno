@@ -1,9 +1,15 @@
 const env = `
- Deno.env = {
+(function(){
+  const internalEnv = {}
+  Deno.env = {
     get(k) {
-      return std.getenv(k);
+      return std.getenv(k) || internalEnv[k];
     },
+    set(k,v) {
+      internalEnv[k] = v.toString()
+    }
   };
+})()
 `;
 
 const args = `
@@ -536,9 +542,8 @@ const stdio = `
 
   console.error = (...parts) => {
     const te = new TextEncoder()
-    for (const p of parts) {
-      Deno.stderr.writeSync(te.encode(p.toString()))
-    }
+    const output = parts.map(p => p.toString()).join(" ")
+    Deno.stderr.writeSync(te.encode(output))
     Deno.stderr.writeSync(te.encode('\\n'))
   }
 
