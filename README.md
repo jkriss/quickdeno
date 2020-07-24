@@ -5,9 +5,11 @@ Tools for bundling and running Deno code that will run with [quickjs](https://be
 quickdeno builds a bundle with your entrypoint and polyfills for some (but not all) Deno runtime functions, variables, and classes.
 
 Currently supported:
+
 - console.error
 - Deno.args
 - Deno.build.os
+- Deno.cwd
 - Deno.env.get
 - Deno.env.set
 - Deno.exit
@@ -52,7 +54,7 @@ Or
 
     quickdeno bundle examples/env.ts > examples/env.bundle.js
     MESSAGE="hi from quickjs!" qjs --std examples/env.bundle.js
-    MESSAGE="hi from deno!" deno run --allow-env examples/env.bundle.js 
+    MESSAGE="hi from deno!" deno run --allow-env examples/env.bundle.js
 
 On my development machine, the qjs version runs about 10x faster.
 

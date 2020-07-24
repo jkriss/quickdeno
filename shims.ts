@@ -616,6 +616,14 @@ const noColor = `
 Deno.noColor = !!Deno.env.get('NO_COLOR')
 `;
 
+const cwd = `
+Deno.cwd = () => {
+  const [str, err] = os.getcwd()
+  if (err) throw new Error('Error getting current working directory: '+err)
+  return str
+}
+`;
+
 const all = {
   args,
   env,
@@ -630,6 +638,7 @@ const all = {
   stdio,
   build,
   noColor,
+  cwd,
 };
 
 const allModules = new Map<string, string>(Object.entries(all));

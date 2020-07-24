@@ -33,6 +33,9 @@ async function runTests() {
 
   assertEquals(Deno.args, ["arg1", "arg2"]);
 
+  assert(Deno.cwd, "Deno.cwd should exist");
+  assert(Deno.cwd(), "Deno.cwd() should return a value");
+
   assertEquals(Deno.readTextFileSync("./test/hi.txt"), "hi");
 
   assert(Deno.readTextFile, "readTextFile should be defined");
